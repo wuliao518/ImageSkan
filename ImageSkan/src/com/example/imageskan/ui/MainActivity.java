@@ -6,34 +6,40 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.example.imageskan.R;
+import com.example.imageskan.adapter.MyGridAdapter;
 import com.example.imageskan.domain.ImageBean;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Entity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.widget.GridView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity{
 	private ProgressDialog mProgressDialog;
 	private GridView mGridView;
-	private List<ImageBean> list = new ArrayList<ImageBean>();
 	private HashMap<String, List<String>> mGruopMap = new HashMap<String, List<String>>(); 
 	private Handler handle=new Handler(){
-		public void handleMessage(android.os.Message msg) {
-			
-		};
+		@Override
+		public void handleMessage(Message msg) {
+			mProgressDialog.dismiss();
+			MyGridAdapter adapter=new MyGridAdapter(getApplicationContext(),getImageBeans(), mGridView);
+			mGridView.setAdapter(adapter);
+			super.handleMessage(msg);
+		}
 	};
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main_activity);
 		initView();
 		
 	}
@@ -41,12 +47,16 @@ public class MainActivity extends Activity{
 		mGridView=(GridView) findViewById(R.id.main_grid);
 		mProgressDialog= ProgressDialog.show(this, null, "正在加载..."); 
 		mProgressDialog.show();
+		getImages();
 	}
 	private void getImages(){
+		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+			Toast.makeText(this, "暂无外部存储", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		new Thread(){
 			@Override
 			public void run() {
-				super.run();
 				Uri uri=MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 				Cursor cursor=getContentResolver().query(uri, null, MediaStore.Images.Media.MIME_TYPE + "=? or "  
 		                + MediaStore.Images.Media.MIME_TYPE + "=?",  
@@ -68,28 +78,27 @@ public class MainActivity extends Activity{
                     	list.add(path);
                     	mGruopMap.put(parentName, list);
                     }
-             
                 }  
-                  
                 //通知Handler扫描图片完成  
+				cursor.close();  
                 handle.sendEmptyMessage(0);  
-                cursor.close();  
             }  
         }.start();  
 	};
-	private void getImageBeans(){
-		List<ImageBean> beans=new ArrayList<ImageBean>();
+	private List<ImageBean> getImageBeans(){
 		Iterator<Map.Entry<String, List<String>>> it = mGruopMap.entrySet().iterator();
-		while (it.hasNext()) {  
-            Map.Entry<String, List<String>> entry = it.next();  
-            ImageBean mImageBean = new ImageBean();  
-            String key = entry.getKey();  
-            List<String> value = entry.getValue();          
-            mImageBean.setFolderPath(key);  
-            mImageBean.setCount(value.size());  
-            mImageBean.setFirstImagePath(value.get(0));//获取该组的第一张图片         
-            beans.add(mImageBean);  
-        }  
+		List<ImageBean> list = new ArrayList<ImageBean>();
+		while (it.hasNext()) {
+			Map.Entry<String, List<String>> entry = it.next();
+			ImageBean mImageBean = new ImageBean();
+			String key = entry.getKey();
+			List<String> value = entry.getValue();
+			mImageBean.setFolderName(key);
+			mImageBean.setImageCounts(value.size());
+			mImageBean.setTopImagePath(value.get(0));//获取该组的第一张图片
+			list.add(mImageBean);
+		}
+		return list;
 	}
 	
 }

@@ -1,29 +1,32 @@
 package com.example.imageskan.domain;
 
-public class ImageBean {
-	//第一张图片路径
-	private String firstImagePath;
-	//文件夹路径
-	private String folderPath;
-	//图片数量
-	private int count;
-	public String getFirstImagePath() {
-		return firstImagePath;
+
+public class ImageBean{
+
+	//文件夹的第一张图片路径
+	private String topImagePath;
+	//文件夹名
+	private String folderName; 
+	//文件夹中的图片数
+	private int imageCounts;
+	
+	public String getTopImagePath() {
+		return topImagePath;
 	}
-	public void setFirstImagePath(String firstImagePath) {
-		this.firstImagePath = firstImagePath;
+	public void setTopImagePath(String topImagePath) {
+		this.topImagePath = topImagePath;
 	}
-	public String getFolderPath() {
-		return folderPath;
+	public String getFolderName() {
+		return folderName;
 	}
-	public void setFolderPath(String folderPath) {
-		this.folderPath = folderPath;
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
 	}
-	public int getCount() {
-		return count;
+	public int getImageCounts() {
+		return imageCounts;
 	}
-	public void setCount(int count) {
-		this.count = count;
+	public void setImageCounts(int imageCounts) {
+		this.imageCounts = imageCounts;
 	}
 	
 }
