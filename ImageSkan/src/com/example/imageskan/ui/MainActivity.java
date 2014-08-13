@@ -13,6 +13,7 @@ import com.example.imageskan.domain.ImageBean;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,18 +21,22 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity{
 	private ProgressDialog mProgressDialog;
 	private GridView mGridView;
-	private HashMap<String, List<String>> mGruopMap = new HashMap<String, List<String>>(); 
+	private ArrayList<ImageBean> list;
+	private HashMap<String, ArrayList<String>> mGruopMap = new HashMap<String, ArrayList<String>>(); 
 	private Handler handle=new Handler(){
 		@Override
 		public void handleMessage(Message msg) {
 			mProgressDialog.dismiss();
-			MyGridAdapter adapter=new MyGridAdapter(getApplicationContext(),getImageBeans(), mGridView);
+			MyGridAdapter adapter=new MyGridAdapter(getApplicationContext(),list=getImageBeans(), mGridView);
 			mGridView.setAdapter(adapter);
 			super.handleMessage(msg);
 		}
@@ -48,6 +53,17 @@ public class MainActivity extends Activity{
 		mProgressDialog= ProgressDialog.show(this, null, "正在加载..."); 
 		mProgressDialog.show();
 		getImages();
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				String path=list.get(position).getFolderName();
+				ArrayList<String> data=mGruopMap.get(path);
+				Intent intent=new Intent(MainActivity.this,SkanActivity.class);
+				intent.putExtra("data",data);
+				startActivityForResult(intent,200);
+			}
+		});
 	}
 	private void getImages(){
 		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
@@ -74,7 +90,7 @@ public class MainActivity extends Activity{
                     if(mGruopMap.containsKey(parentName)){
                     	mGruopMap.get(parentName).add(path);
                     }else{
-                    	List<String> list=new ArrayList<String>();
+                    	ArrayList<String> list=new ArrayList<String>();
                     	list.add(path);
                     	mGruopMap.put(parentName, list);
                     }
@@ -85,20 +101,25 @@ public class MainActivity extends Activity{
             }  
         }.start();  
 	};
-	private List<ImageBean> getImageBeans(){
-		Iterator<Map.Entry<String, List<String>>> it = mGruopMap.entrySet().iterator();
-		List<ImageBean> list = new ArrayList<ImageBean>();
+	private ArrayList<ImageBean> getImageBeans(){
+		Iterator<Map.Entry<String, ArrayList<String>>> it = mGruopMap.entrySet().iterator();
+		ArrayList<ImageBean> list = new ArrayList<ImageBean>();
 		while (it.hasNext()) {
-			Map.Entry<String, List<String>> entry = it.next();
+			Map.Entry<String, ArrayList<String>> entry = it.next();
 			ImageBean mImageBean = new ImageBean();
 			String key = entry.getKey();
-			List<String> value = entry.getValue();
+			ArrayList<String> value = entry.getValue();
 			mImageBean.setFolderName(key);
 			mImageBean.setImageCounts(value.size());
 			mImageBean.setTopImagePath(value.get(0));//获取该组的第一张图片
 			list.add(mImageBean);
 		}
 		return list;
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		data.getExtras().get("data");
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
 }
