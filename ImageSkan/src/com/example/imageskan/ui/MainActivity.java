@@ -118,7 +118,10 @@ public class MainActivity extends Activity{
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		data.getExtras().get("data");
+		if(resultCode==200){			
+			ArrayList<String> strs=(ArrayList<String>) data.getExtras().get("data");
+			Toast.makeText(getApplicationContext(), "您选中了"+strs.size()+"个", 0).show();;
+		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	

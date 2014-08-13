@@ -9,13 +9,17 @@ import com.example.imageskan.view.MyImageView;
 import com.example.imageskan.view.MyImageView.OnMeasureListener;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -24,6 +28,8 @@ public class SkanActivity extends Activity {
 	private ArrayList<String> lists;
 	private LayoutInflater inflate;
 	private int viewWidth=0,viewHeight=0;
+	private MyAdapter adapter;
+	private ArrayList<String> strs=new ArrayList<String>();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,9 +40,17 @@ public class SkanActivity extends Activity {
 	private void initView() {
 		mGridView=(GridView) findViewById(R.id.child_grid);
 		inflate=LayoutInflater.from(SkanActivity.this);
-		mGridView.setAdapter(new MyAdapter());
+		adapter=new MyAdapter();
+		mGridView.setAdapter(adapter);
 	}
-	
+	@Override
+	public void onBackPressed() {
+		Intent intent=new Intent();
+		intent.putExtra("data", strs);
+		setResult(200,intent);
+		finish();
+		super.onBackPressed();
+	}
 	private class MyAdapter extends BaseAdapter{
 
 		@Override
@@ -54,7 +68,7 @@ public class SkanActivity extends Activity {
 		}
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			String path=lists.get(position);
+			final String path=lists.get(position);
 			ViewHolder viewHolder=null;
 			if(convertView==null){
 				viewHolder=new ViewHolder();
@@ -88,6 +102,18 @@ public class SkanActivity extends Activity {
 			}else{				
 				viewHolder.image.setImageResource(R.drawable.friends_sends_pictures_no);
 			}
+			viewHolder.check.setOnCheckedChangeListener(new OnCheckedChangeListener() {	
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if(isChecked){
+						strs.add(path);
+					}else{
+						if(strs.contains(path))
+							strs.remove(path);
+					}
+				}
+			});
+			
 			return convertView;
 			
 		}		
