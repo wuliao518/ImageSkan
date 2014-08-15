@@ -112,7 +112,7 @@ public class MainActivity extends Activity{
 			mImageBean.setFolderName(key);
 			mImageBean.setImageCounts(value.size());
 			mImageBean.setTopImagePath(value.get(0));//获取该组的第一张图片
-			list.add(mImageBean);
+		    list.add(mImageBean);
 		}
 		return list;
 	}
@@ -120,7 +120,8 @@ public class MainActivity extends Activity{
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode==200){			
 			ArrayList<String> strs=(ArrayList<String>) data.getExtras().get("data");
-			Toast.makeText(getApplicationContext(), "您选中了"+strs.size()+"个", 0).show();;
+				setResult(0, data);
+				finish();
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}

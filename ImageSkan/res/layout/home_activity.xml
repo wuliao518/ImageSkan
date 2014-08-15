@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:background="#dd000000"
+    	android:layout_height="40dp">
+    	<TextView
+    	    android:gravity="center"
+    	    android:text="秀色可餐"
+    	    android:layout_marginLeft="5dp"
+    	    android:textColor="@android:color/white"
+    	    android:layout_width="wrap_content"
+    		android:layout_height="match_parent"/>
+    	<View
+			android:visibility="invisible"
+    	    android:layout_weight="1"
+    	    android:layout_width="0dp"
+    	    android:layout_height="match_parent"/>
+    	<View
+    	    android:id="@+id/view_add"
+    	    android:layout_marginLeft="5dp"
+    	    android:layout_gravity="right"
+    	    android:layout_width="40dp"
+    	    android:layout_height="match_parent"
+    	    android:background="@drawable/add" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv_photo"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" >
+
+</ListView>
+
+</LinearLayout>
