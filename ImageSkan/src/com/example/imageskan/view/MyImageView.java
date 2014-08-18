@@ -2,6 +2,7 @@ package com.example.imageskan.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 public class MyImageView extends ImageView {
@@ -14,6 +15,8 @@ public class MyImageView extends ImageView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {  
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);      
         //将图片测量的大小回调到onMeasureSize()方法中  
+        Log.i("ImageSkan",widthMeasureSpec+"...."+heightMeasureSpec);
+        System.out.println("ImageSkan"+widthMeasureSpec+"...."+heightMeasureSpec);
         if(onMeasureListener != null){  
             onMeasureListener.onMeasureSize(getMeasuredWidth(), getMeasuredHeight());  
         }  

@@ -113,7 +113,7 @@ public class SkanActivity extends Activity {
 					}
 				}
 			});
-			
+			viewHolder.check.setChecked(strs.contains(path));
 			return convertView;
 			
 		}		

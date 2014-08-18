@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -77,8 +78,7 @@ public class HomeActivity extends Activity implements OnClickListener{
 		for(String path:strs){
 			try {
 				ExifInterface exif= new ExifInterface(path);
-				String dateTime=exif.getAttribute("DateTime");
-				System.out.println(dateTime);
+				//String dateTime=exif.getAttribute("DateTime");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -116,15 +116,11 @@ public class HomeActivity extends Activity implements OnClickListener{
 			}else{
 				viewHolder=(ViewHolder) convertView.getTag();
 			}
-			viewHolder.iv.setOnMeasureListener(new OnMeasureListener() {
-				@Override
-				public void onMeasureSize(int width, int height) {
-					//HomeActivity.this.width=width;
-					HomeActivity.this.height=height;
-					System.out.println(width+"..."+height);
-				}
-			});
+			LayoutParams params=viewHolder.iv.getLayoutParams();
+			params.height=height;
+			params.height=getHeight(path);
 			viewHolder.tv.setText(path);
+			viewHolder.iv.setLayoutParams(params);
 			Bitmap bitmap=ImageLoader.getInstance().loadImage(path, width, height, new OnCallBackListener() {		
 				@Override
 				public void setOnCallBackListener(Bitmap bitmap, String url) {
@@ -146,5 +142,22 @@ public class HomeActivity extends Activity implements OnClickListener{
 		public TextView tv;
 		public MyImageView iv;
 	}
-
+	
+	private int getHeight(String path){
+		BitmapFactory.Options options=new BitmapFactory.Options();
+		options.inJustDecodeBounds=true;
+		BitmapFactory.decodeFile(path, options);
+		int imageWidth=options.outWidth;
+		int imageHeight=options.outHeight;
+		if(imageWidth>width){
+			float scale=(float)imageWidth/(float)width;
+			return (int) (imageHeight/scale);
+		}
+		return imageHeight;
+		
+		
+		
+		
+		
+	} 
 }

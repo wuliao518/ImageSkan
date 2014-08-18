@@ -98,8 +98,8 @@ public class ImageLoader {
         int bitmapHeight = options.outHeight;  
         if(bitmapWidth > viewWidth){  
             int widthScale = Math.round((float) bitmapWidth / (float) viewWidth);  
-            //int heightScale = Math.round((float) bitmapHeight / (float) viewWidth);  
-            inSampleSize = widthScale; //< heightScale ? widthScale : heightScale;  
+            int heightScale = Math.round((float) bitmapHeight / (float) viewWidth);  
+            inSampleSize = widthScale< heightScale ? widthScale : heightScale;  
         }
         System.out.println(inSampleSize+"xixixixixi");
         return inSampleSize;  
