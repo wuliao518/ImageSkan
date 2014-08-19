@@ -28,6 +28,7 @@ import com.example.imageskan.config.Config;
 public class UploadFile {
 	public static UploadFile mUploadFile;
 	private ExecutorService mThreadPool;
+	private OnUploadListener listener;
 	private static final String CHARSET = "utf-8";
 	private Handler handle=new Handler(){
 		@Override
@@ -36,30 +37,29 @@ public class UploadFile {
 			try {
 				JSONObject mjsonoJsonObject=new JSONObject((String) msg.obj);
 				int code=mjsonoJsonObject.getInt("status");
-				if(code==200){
-					
-				}
+				String message=mjsonoJsonObject.getString("message");
+				listener.callBack(message);
+				System.out.println("success");
 			} catch (JSONException e) {
 				e.printStackTrace();
-			}
-			
-			
+			}			
 		}
 		
 	};
 	private UploadFile(){
-		mThreadPool=Executors.newFixedThreadPool(2);
+		mThreadPool=Executors.newFixedThreadPool(1);
 	}
 	public synchronized static UploadFile getInstances(){
 		if(mUploadFile==null){
 			mUploadFile=new UploadFile();
 		}
-		return null;
+		return mUploadFile;
 	}
-	public void uploadFile(final File file,final String RequestURL){
+	public void uploadFile(final File file,OnUploadListener listener){
 		if(mThreadPool==null){
-			mThreadPool=Executors.newFixedThreadPool(2);
+			mThreadPool=Executors.newFixedThreadPool(1);
 		}
+		this.listener=listener;
 		mThreadPool.execute(new Thread(){
 			@Override
 			public void run() {
@@ -70,7 +70,7 @@ public class UploadFile {
 				String PREFIX = "--", LINE_END = "\r\n";
 				String CONTENT_TYPE = "multipart/form-data"; // 内容类型
 				try {
-					URL url = new URL(RequestURL);
+					URL url = new URL(Config.UploadURI);
 					HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 					conn.setReadTimeout(Config.TIME_OUT);
 					conn.setConnectTimeout(Config.TIME_OUT);
@@ -95,7 +95,7 @@ public class UploadFile {
 						 * filename是文件的名字，包含后缀名
 						 */
 
-						sb.append("Content-Disposition: form-data; name=\"file\"; filename=\""
+						sb.append("Content-Disposition: form-data; name=\"upfile\"; filename=\""
 								+ file.getName() + "\"" + LINE_END);
 						sb.append("Content-Type: application/octet-stream; charset="
 								+ CHARSET + LINE_END);
@@ -111,6 +111,7 @@ public class UploadFile {
 						dos.write(LINE_END.getBytes());
 						byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINE_END)
 								.getBytes();
+						
 						dos.write(end_data);
 						dos.flush();
 						/**
@@ -146,4 +147,8 @@ public class UploadFile {
 			mThreadPool=null;
 		}
 	}
+	public interface OnUploadListener{
+		public void callBack(String str);
+	}
+	
 }

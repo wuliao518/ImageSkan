@@ -1,10 +1,12 @@
 package com.example.imageskan.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,7 +27,9 @@ import android.widget.Toast;
 
 import com.example.imageskan.R;
 import com.example.imageskan.utils.ImageLoader;
+import com.example.imageskan.utils.UploadFile;
 import com.example.imageskan.utils.ImageLoader.OnCallBackListener;
+import com.example.imageskan.utils.UploadFile.OnUploadListener;
 import com.example.imageskan.view.MyImageView;
 import com.example.imageskan.view.MyImageView.OnMeasureListener;
 
@@ -35,7 +39,8 @@ public class HomeActivity extends Activity implements OnClickListener{
 	private MyAdapter adapter;
 	private ArrayList<String> strs;
 	private LayoutInflater inflate;
-	private int width=0,height=0;
+	private ProgressDialog progress;
+	private int width=0,height=0,count=0;
 	private Handler handle=new Handler(){
 		@Override
 		public void handleMessage(Message msg) {
@@ -53,6 +58,7 @@ public class HomeActivity extends Activity implements OnClickListener{
 	}
 	private void initView() {
 		width=getWindowManager().getDefaultDisplay().getWidth();
+		progress=new ProgressDialog(HomeActivity.this);
 		view=findViewById(R.id.view_add);
 		mListView=(ListView) findViewById(R.id.lv_photo);
 		inflate=LayoutInflater.from(this);
@@ -75,6 +81,22 @@ public class HomeActivity extends Activity implements OnClickListener{
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		strs=(ArrayList<String>) data.getExtras().get("data");
+		count=0;
+		progress.show();
+		
+		for(int i=0;i<strs.size();i++){
+			File file=new File(strs.get(i));
+			if(file!=null){
+				UploadFile.getInstances().uploadFile(file,new OnUploadListener() {
+					@Override
+					public void callBack(String str) {
+						count++;
+						if(count==strs.size())progress.dismiss();
+						Toast.makeText(getApplicationContext(), str, 0).show();
+					}
+				});
+			}
+		}	
 		for(String path:strs){
 			try {
 				ExifInterface exif= new ExifInterface(path);
@@ -83,18 +105,16 @@ public class HomeActivity extends Activity implements OnClickListener{
 				e.printStackTrace();
 			}
 		}
-		Toast.makeText(getApplicationContext(), "您选择了"+strs.size()+"个", 0).show();
+		//Toast.makeText(getApplicationContext(), "您选择了"+strs.size()+"个", 0).show();
 		handle.sendEmptyMessage(0);
 		
 	}
 
 	private class MyAdapter extends BaseAdapter{
-
 		@Override
 		public int getCount() {
 			return strs.size();
 		}
-
 		@Override
 		public Object getItem(int position) {
 			return strs.get(position);

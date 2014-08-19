@@ -16,7 +16,6 @@ public class MyImageView extends ImageView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);      
         //将图片测量的大小回调到onMeasureSize()方法中  
         Log.i("ImageSkan",widthMeasureSpec+"...."+heightMeasureSpec);
-        System.out.println("ImageSkan"+widthMeasureSpec+"...."+heightMeasureSpec);
         if(onMeasureListener != null){  
             onMeasureListener.onMeasureSize(getMeasuredWidth(), getMeasuredHeight());  
         }  

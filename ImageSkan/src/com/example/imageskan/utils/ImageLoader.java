@@ -94,14 +94,13 @@ public class ImageLoader {
             return inSampleSize;  
         }  
         int bitmapWidth = options.outWidth;
-        System.out.println(bitmapWidth+"hahahahah");
+
         int bitmapHeight = options.outHeight;  
         if(bitmapWidth > viewWidth){  
             int widthScale = Math.round((float) bitmapWidth / (float) viewWidth);  
             int heightScale = Math.round((float) bitmapHeight / (float) viewWidth);  
             inSampleSize = widthScale< heightScale ? widthScale : heightScale;  
         }
-        System.out.println(inSampleSize+"xixixixixi");
         return inSampleSize;  
     }  
 
